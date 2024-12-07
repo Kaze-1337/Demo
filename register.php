@@ -3,16 +3,16 @@ session_start();
 include 'includes/db_connect.php';
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-    // Lấy dữ liệu từ form
+    //lấy dữ liệu từ form
     $username = $_POST['username'];
     $password = $_POST['password'];
-    $role = $_POST['role']; // Lấy giá trị role từ form
+    $role = $_POST['role']; 
 
-    // Kiểm tra các trường bắt buộc
+    //kiểm tra các trường bắt buộc
     if (empty($username) || empty($password) || empty($role)) {
         echo "Vui lòng điền đầy đủ thông tin!";
     } else {
-        // Kiểm tra nếu tên đăng nhập đã tồn tại
+        //kiểm tra nếu tên đăng nhập đã tồn tại
         $stmt = $conn->prepare("SELECT * FROM users WHERE username = :username");
         $stmt->execute(['username' => $username]);
         $user = $stmt->fetch(PDO::FETCH_ASSOC);
@@ -20,10 +20,10 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         if ($user) {
             echo "Tên đăng nhập đã tồn tại!";
         } else {
-            // Mã hóa mật khẩu trước khi lưu vào cơ sở dữ liệu
+            //mã hóa mật khẩu trước khi lưu vào database
             $hashed_password = password_hash($password, PASSWORD_DEFAULT);
 
-            // Thêm người dùng mới vào cơ sở dữ liệu
+            //thêm người dùng mới vào database
             $stmt = $conn->prepare("INSERT INTO users (username, password, role) VALUES (:username, :password, :role)");
             $stmt->execute([
                 'username' => $username,
@@ -32,7 +32,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             ]);
 
             echo "Đăng ký thành công! Vui lòng đăng nhập.";
-            header("Location: login.php"); // Chuyển hướng đến trang đăng nhập
+            header("Location: login.php");
             exit();
         }
     }

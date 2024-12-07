@@ -7,7 +7,7 @@ if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'customer') {
     exit();
 }
 
-// Kiểm tra giỏ hàng
+//kiểm tra giỏ hàng
 if (empty($_SESSION['cart'])) {
     echo "<p>Giỏ hàng của bạn trống. <a href='shop.php'>Quay lại cửa hàng</a></p>";
     exit();
@@ -18,7 +18,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_cart'])) {
         if ($quantity > 0) {
             $_SESSION['cart'][$product_id] = $quantity;
         } else {
-            unset($_SESSION['cart'][$product_id]); // Xóa sản phẩm nếu số lượng = 0
+            unset($_SESSION['cart'][$product_id]); //xóa sản phẩm nếu hết hàng
         }
     }
 }
@@ -36,7 +36,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_cart'])) {
             const quantityInput = document.getElementById('quantity_' + productId);
             const quantity = quantityInput.value;
 
-            // Gửi AJAX để cập nhật giá và số lượng
+            //gửi AJAX để cập nhật giá và số lượng
             const xhr = new XMLHttpRequest();
             xhr.open('POST', 'update_cart.php', true);
             xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');

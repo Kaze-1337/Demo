@@ -2,28 +2,29 @@
 session_start();
 include '../includes/db_connect.php';
 
-// Kiểm tra xem người dùng đã đăng nhập hay chưa
+//kiểm tra xem người dùng đã đăng nhập tài khoản role customer hay chưa
 if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'customer') {
     header("Location: ../login.php");
     exit();
 }
 
-// Lấy danh sách sản phẩm có số lượng > 0
+//lấy danh sách sản phẩm còn hàng từ database
 $stmt = $conn->prepare("SELECT * FROM products WHERE quantity > 0");
 $stmt->execute();
 $products = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-// Xử lý giỏ hàng nếu có
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['product_id'])) {
+//xử lý giỏ hàng
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['product_id'])) 
+{
     $product_id = $_POST['product_id'];
     $quantity = $_POST['quantity'];
 
-    // Lưu thông tin sản phẩm vào giỏ hàng
+    //lưu thông tin sản phẩm vào giỏ hàng
     if (!isset($_SESSION['cart'])) {
         $_SESSION['cart'] = [];
     }
 
-    // Kiểm tra nếu sản phẩm đã có trong giỏ, cập nhật số lượng
+    //kiểm tra nếu sản phẩm đã có trong giỏ, cập nhật số lượng
     if (isset($_SESSION['cart'][$product_id])) {
         $_SESSION['cart'][$product_id] += $quantity;
     } else {

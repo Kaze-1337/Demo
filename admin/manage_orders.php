@@ -7,7 +7,7 @@ if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'admin') {
 
 include '../includes/db_connect.php';
 
-// Lấy danh sách đơn hàng
+//lấy list đơn hàng
 $stmt = $conn->prepare("SELECT * FROM orders");
 $stmt->execute();
 $orders = $stmt->fetchAll(PDO::FETCH_ASSOC);

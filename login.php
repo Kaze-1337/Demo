@@ -6,23 +6,23 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $username = trim($_POST['username']);
     $password = trim($_POST['password']);
 
-    // Kiểm tra nếu thông tin đăng nhập không rỗng
+    //kiểm tra thông tin hợp lệ
     if (empty($username) || empty($password)) {
         echo "<p style='color: red;'>Vui lòng điền đầy đủ thông tin!</p>";
     } else {
         try {
-            // Truy vấn để lấy thông tin người dùng từ cơ sở dữ liệu
+            //truy vấn để lấy thông tin người dùng từ database
             $stmt = $conn->prepare("SELECT * FROM users WHERE username = :username");
             $stmt->execute(['username' => $username]);
             $user = $stmt->fetch(PDO::FETCH_ASSOC);
 
             if ($user && password_verify($password, $user['password'])) {
-                // Đăng nhập thành công, lưu thông tin người dùng vào session
+                //đăng nhập thành công, lưu thông tin người dùng vào session
                 $_SESSION['user_id'] = $user['id'];
                 $_SESSION['username'] = $user['username'];
-                $_SESSION['role'] = $user['role']; // 'admin' hoặc 'customer'
+                $_SESSION['role'] = $user['role']; 
 
-                // Điều hướng đến trang phù hợp dựa trên vai trò
+                //điều hướng tới trang phù hợp với role của tài khoản
                 if ($user['role'] === 'admin') {
                     header("Location: admin/dashboard.php");
                 } else if ($user['role'] === 'customer') {

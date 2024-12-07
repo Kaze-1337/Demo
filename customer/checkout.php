@@ -2,19 +2,19 @@
 session_start();
 include '../includes/db_connect.php';
 
-// Kiểm tra xem người dùng đã đăng nhập chưa
+//kiểm tra xem người dùng đã đăng nhập tài khoản role customer chưa
 if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'customer') {
     header("Location: ../login.php");
     exit();
 }
 
-// Kiểm tra nếu giỏ hàng trống
+//kiểm tra nếu giỏ hàng trống
 if (empty($_SESSION['cart'])) {
     echo "<p>Giỏ hàng của bạn trống. <a href='shop.php'>Quay lại cửa hàng</a></p>";
     exit();
 }
 
-// Tính tổng giá trị đơn hàng
+//tính tổng giá trị đơn hàng
 $total_price = 0;
 foreach ($_SESSION['cart'] as $product_id => $quantity) {
     $stmt = $conn->prepare("SELECT price FROM products WHERE id = :id");
@@ -23,25 +23,25 @@ foreach ($_SESSION['cart'] as $product_id => $quantity) {
     $total_price += $product['price'] * $quantity;
 }
 
-// Xử lý khi người dùng bấm nút "Xác nhận thanh toán"
+//xử lý khi người dùng bấm nút thanh toán
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $address = $_POST['address'];
     $payment_method = $_POST['payment_method'];
 
-    // Chèn thông tin đơn hàng vào bảng `orders`
+    //chèn thông tin đơn hàng vào bảng `orders`
     $stmt = $conn->prepare("
         INSERT INTO orders (customer_id, total_price, created_at) 
         VALUES (:customer_id, :total_price, NOW())
     ");
     $stmt->execute([
-        'customer_id' => $_SESSION['user_id'], // Sử dụng `customer_id` thay vì `user_id`
+        'customer_id' => $_SESSION['user_id'], 
         'total_price' => $total_price,
     ]);
 
-    // Lấy ID của đơn hàng vừa tạo
+  
     $order_id = $conn->lastInsertId();
 
-    // Thêm từng sản phẩm vào bảng `order_items`
+  
     foreach ($_SESSION['cart'] as $product_id => $quantity) {
         $stmt = $conn->prepare("
             INSERT INTO order_items (order_id, product_id, quantity, price)
@@ -51,11 +51,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             'order_id' => $order_id,
             'product_id' => $product_id,
             'quantity' => $quantity,
-            'price' => $product['price'], // Giá của từng sản phẩm
+            'price' => $product['price'], 
         ]);
     }
 
-    // Cập nhật số lượng sản phẩm trong kho
+    //cập nhật số lượng sản phẩm trong kho
     foreach ($_SESSION['cart'] as $product_id => $quantity) {
         $stmt = $conn->prepare("UPDATE products SET quantity = quantity - :quantity WHERE id = :id");
         $stmt->execute([
@@ -64,10 +64,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         ]);
     }
 
-    // Xóa giỏ hàng sau khi thanh toán
+    //xóa giỏ hàng sau khi thanh toán
     unset($_SESSION['cart']);
 
-    // Hiển thị thông báo thành công
+    //hiển thị thông báo thành công
     echo "<p>Thanh toán thành công! Cảm ơn bạn đã mua hàng.</p>";
     echo '<a href="shop.php" class="btn">Quay về trang chủ cửa hàng</a>';
     exit();

@@ -2,13 +2,13 @@
 session_start();
 include '../includes/db_connect.php';
 
-// Kiểm tra quyền truy cập, nếu không phải admin thì không được vào trang này
+//kiểm tra quyền truy cập xem có phải admin không
 if (!isset($_SESSION['role']) || $_SESSION['role'] !== 'admin') {
     header("Location: ../login.php");
     exit();
 }
 
-// Kiểm tra xem form có được gửi không
+//kiểm tra xem form có được gửi không
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     // Lấy dữ liệu từ form
     $name = $_POST['name'];
@@ -18,13 +18,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $image_tmp = $_FILES['image']['tmp_name'];
     $image_path = "../assets/images/" . $image;
 
-    // Kiểm tra các trường dữ liệu
+    //kiểm tra các trường dữ liệu
     if (empty($name) || empty($price) || empty($quantity) || empty($image)) {
         echo "Tất cả các trường đều bắt buộc!";
     } else {
-        // Upload hình ảnh
+        //upload file ảnh
         if (move_uploaded_file($image_tmp, $image_path)) {
-            // Thêm sản phẩm vào cơ sở dữ liệu
+            //thêm sản phẩm vào database
             $stmt = $conn->prepare("INSERT INTO products (name, price, quantity, image) VALUES (:name, :price, :quantity, :image)");
             $stmt->execute([
                 'name' => $name,
